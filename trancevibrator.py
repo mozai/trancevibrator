@@ -3,10 +3,9 @@ works with the Drmn' Trance Vibe device too
 """
 # props to Tim Cexx (blink_led) and HIROSE Masaaki (Perl module)
 # TODO: get this working in OSX and in Windows
-# TODO: something to tidy-up (turn off LEDs, stop vibration) on dealloc
 import usb
 import time
-__version__ = "2018.04.19"
+__version__ = "2018.04.20"
 __author__ = 'Moses "Mozai" Moore'
 
 
@@ -30,16 +29,16 @@ class Trancevibrator:
     # needed another time-gap in Windows between set-conf and 'reset'
     time.sleep(0.1)
 
-#  def __del__(self):
-#    " stops vibration and blinking lights on exit "
-#    # TODO: if called at interpreter shutdown, it screws up
-#    #   I think module 'usb' loses some important global before this
-#    #   finalizer is called.  bug report?
-#    #   "libusb: warning [add_to_flying_list] failed to arm first
-#    #    timerfd (errno 9)"
-#    self.device.ctrl_transfer(65, 0, 0, 768)
-#    if self.was_kernel_driver:
-#      usb.util.dispose_resources(self.device)
+  def __enter__(self):
+    # noop
+    return self
+
+  def __exit__(self, err_type, err_value, err_trace):
+    # stop the device from blinking & shaking
+    # before discarding or throwing an exception
+    self.device.ctrl_transfer(65, 0, 0, 768)
+    if self.was_kernel_driver:
+      usb.util.dispose_resources(self.device)
 
   def blink_led(self, led_value=0, duration=0):
     """ blinks the Trance Vibrator's (non-existent) LED lights
@@ -77,12 +76,3 @@ class Trancevibrator:
       time.sleep(duration)
       self.vibrate(0)
     return retval
-
-
-if __name__ == '__main__':
-  # test mode
-  TRANCE = Trancevibrator()
-  for i in range(0, 257, 64):
-    print("vibrate({})".format(i))
-    TRANCE.vibrate(i, 1.0)
-  TRANCE = None
