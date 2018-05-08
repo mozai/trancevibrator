@@ -29,9 +29,22 @@ you use `.vibrate(0)` before your program ends, or you unplug the device.
 Since an exception could crash your program, use `with` unless you have
 a good reason.
 
+## INSTALL
+
+In Debian Linux, I used `apt-get install python-usb`.  Well,
+`python3-usb`.  It also brings in `libusb-1.0`.  I would get
+"usb.core.USBError: Errno 13 Access denied" if I didn't run as root,
+but I believe there's a way to configure udev to create the USB device
+files with different group owner and permissions.
+
+In macOS, `sudo easy_install pyusb` for the Python2.7 you already have,
+but I needed to use homebrew for `brew install libusb` otherwise I would
+get "usb.core.NoBackendError: No backend available".  Aside from installing
+pyusb, I didn't need to run as root.
+
 
 ## TODO
-- get this working in macOS and Windows
+- get this working in MS-Windows
 
 
 ## Acknowledgements
